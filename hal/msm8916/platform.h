@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2019, The Linux Foundation. All rights reserved.
  * Not a Contribution.
  *
  * Copyright (C) 2013 The Android Open Source Project
@@ -183,7 +183,6 @@ enum {
     SND_DEVICE_IN_CAMCORDER_MIC,
     SND_DEVICE_IN_VOICE_DMIC,
     SND_DEVICE_IN_VOICE_SPEAKER_DMIC,
-    SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP,
     SND_DEVICE_IN_VOICE_SPEAKER_QMIC,
     SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC,
     SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC,

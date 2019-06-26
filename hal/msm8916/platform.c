@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013-2019, The Linux Foundation. All rights reserved.
  * Not a Contribution.
  *
  * Copyright (C) 2013 The Android Open Source Project
@@ -307,7 +307,6 @@ struct platform_data {
 
 static bool is_external_codec = false;
 static bool is_slimbus_interface = false;
-static bool is_qcom_feature_phone = false;
 
 int pcm_device_table[AUDIO_USECASE_MAX][2] = {
     [USECASE_AUDIO_PLAYBACK_DEEP_BUFFER] = {DEEP_BUFFER_PCM_DEVICE,
@@ -497,7 +496,7 @@ static const char * const device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_HEADSET_MIC] = "headset-mic",
     [SND_DEVICE_IN_HEADSET_MIC_FLUENCE] = "headset-mic",
     [SND_DEVICE_IN_VOICE_SPEAKER_MIC] = "voice-speaker-mic",
-    [SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP] = "speaker-mic-flip-close",
+    [SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP] = "speaker-mic-flip-open",
     [SND_DEVICE_IN_VOICE_HEADSET_MIC] = "voice-headset-mic",
     [SND_DEVICE_IN_HDMI_MIC] = "hdmi-mic",
     [SND_DEVICE_IN_BT_SCO_MIC] = "bt-sco-mic",
@@ -507,7 +506,6 @@ static const char * const device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_CAMCORDER_MIC] = "camcorder-mic",
     [SND_DEVICE_IN_VOICE_DMIC] = "voice-dmic-ef",
     [SND_DEVICE_IN_VOICE_SPEAKER_DMIC] = "voice-speaker-dmic-ef",
-    [SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP] = "speaker-mic-flip-open",
     [SND_DEVICE_IN_VOICE_SPEAKER_QMIC] = "voice-speaker-qmic",
     [SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC] = "voice-tty-full-headset-mic",
     [SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC] = "voice-tty-vco-handset-mic",
@@ -644,7 +642,7 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_HEADSET_MIC] = 8,
     [SND_DEVICE_IN_HEADSET_MIC_FLUENCE] = 47,
     [SND_DEVICE_IN_VOICE_SPEAKER_MIC] = 11,
-    [SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP] = 49,
+    [SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP] = 42,
     [SND_DEVICE_IN_VOICE_HEADSET_MIC] = 8,
     [SND_DEVICE_IN_HDMI_MIC] = 4,
     [SND_DEVICE_IN_BT_SCO_MIC] = 21,
@@ -654,7 +652,6 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_CAMCORDER_MIC] = 4,
     [SND_DEVICE_IN_VOICE_DMIC] = 41,
     [SND_DEVICE_IN_VOICE_SPEAKER_DMIC] = 43,
-    [SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP] = 42,
     [SND_DEVICE_IN_VOICE_SPEAKER_QMIC] = 19,
     [SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC] = 16,
     [SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC] = 36,
@@ -800,7 +797,6 @@ static struct name_to_index snd_device_name_index[SND_DEVICE_MAX] = {
     {TO_NAME_INDEX(SND_DEVICE_IN_CAMCORDER_MIC)},
     {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_DMIC)},
     {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_SPEAKER_DMIC)},
-    {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP)},
     {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_SPEAKER_QMIC)},
     {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC)},
     {TO_NAME_INDEX(SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC)},
@@ -1174,6 +1170,14 @@ static void query_platform(const char *snd_card_name,
                  sizeof("msm8909-skue-snd-card"))) {
         strlcpy(mixer_xml_path, MIXER_XML_PATH_SKUE,
                 sizeof(MIXER_XML_PATH_SKUE));
+        msm_device_to_be_id = msm_device_to_be_id_internal_codec;
+        msm_be_id_array_len  =
+            sizeof(msm_device_to_be_id_internal_codec) / sizeof(msm_device_to_be_id_internal_codec[0]);
+
+    } else if (!strncmp(snd_card_name, "msm8909-fp-snd-card",
+                 sizeof("msm8909-fp-snd-card"))) {
+        strlcpy(mixer_xml_path, MIXER_XML_PATH_FP,
+                sizeof(MIXER_XML_PATH_FP));
         msm_device_to_be_id = msm_device_to_be_id_internal_codec;
         msm_be_id_array_len  =
             sizeof(msm_device_to_be_id_internal_codec) / sizeof(msm_device_to_be_id_internal_codec[0]);
@@ -1608,7 +1612,6 @@ static void set_platform_defaults(struct platform_data * my_data)
     hw_interface_table[SND_DEVICE_IN_CAMCORDER_MIC] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_DMIC] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_SPEAKER_DMIC] = strdup("SLIMBUS_0_TX");
-    hw_interface_table[SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_SPEAKER_QMIC] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC] = strdup("SLIMBUS_0_TX");
@@ -2180,17 +2183,7 @@ void *platform_init(struct audio_device *adev)
         return NULL;
     }
 
-    property_get("sys.qcom.feature_phone",value,"");
-    if (!strncmp("true", value, sizeof("true"))) {
-        is_qcom_feature_phone = true;
-    }
-
-    if(is_qcom_feature_phone){
-        strlcpy(mixer_xml_path, MIXER_XML_PATH_FP,
-                sizeof(MIXER_XML_PATH_FP));
-    } else {
-        query_platform(snd_card_name, mixer_xml_path);
-    }
+    query_platform(snd_card_name, mixer_xml_path);
     ALOGD("%s: mixer path file is %s", __func__,
                             mixer_xml_path);
 
@@ -2319,7 +2312,8 @@ void *platform_init(struct audio_device *adev)
     else if (!strncmp(snd_card_name, "sdm660-snd-card-skush",
                sizeof("sdm660-snd-card-skush")))
         platform_info_init(PLATFORM_INFO_XML_PATH_SKUSH, my_data, PLATFORM);
-    else if (is_qcom_feature_phone)
+    else if (!strncmp(snd_card_name, "msm8909-fp-snd-card",
+               sizeof("msm8909-fp-snd-card")))
         platform_info_init(PLATFORM_INFO_XML_PATH_FP, my_data, PLATFORM);
     else
         platform_info_init(PLATFORM_INFO_XML_PATH, my_data, PLATFORM);
@@ -4028,6 +4022,8 @@ snd_device_t platform_get_input_snd_device(void *platform, audio_devices_t out_d
 {
     struct platform_data *my_data = (struct platform_data *)platform;
     struct audio_device *adev = my_data->adev;
+    const char *snd_card_name;
+
     /*
      * TODO: active_input always points to last opened input. Source returned will
      * be wrong if more than one active inputs are present.
@@ -4036,6 +4032,8 @@ snd_device_t platform_get_input_snd_device(void *platform, audio_devices_t out_d
                                 AUDIO_SOURCE_DEFAULT : adev->active_input->source;
 
     audio_mode_t    mode   = adev->mode;
+    snd_card_name = mixer_get_name(adev->mixer);
+
     audio_devices_t in_device = ((adev->active_input == NULL) ?
                                     AUDIO_DEVICE_NONE : adev->active_input->device)
                                 & ~AUDIO_DEVICE_BIT_IN;
@@ -4141,19 +4139,16 @@ snd_device_t platform_get_input_snd_device(void *platform, audio_devices_t out_d
                     adev->acdb_settings |= DMIC_FLAG;
                     if (my_data->fluence_mode == FLUENCE_BROADSIDE)
                        snd_device = SND_DEVICE_IN_VOICE_SPEAKER_DMIC_BROADSIDE;
-                    else if (is_qcom_feature_phone)
-                       snd_device = SND_DEVICE_IN_VOICE_SPEAKER_DMIC_FP;
+                    else if ((!strncmp(snd_card_name, "msm8909-fp-snd-card",
+				sizeof("msm8909-fp-snd-card"))))
+                       snd_device = SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP;
 	             else
                        snd_device = SND_DEVICE_IN_VOICE_SPEAKER_DMIC;
                 }
                 if (audio_extn_hfp_is_active(adev))
                     platform_set_echo_reference(adev, true, out_device);
             } else {
-		if(is_qcom_feature_phone){
-                    snd_device = SND_DEVICE_IN_VOICE_SPEAKER_MIC_FP;
-		} else {
-                    snd_device = SND_DEVICE_IN_VOICE_SPEAKER_MIC;
-		}
+		snd_device = SND_DEVICE_IN_VOICE_SPEAKER_MIC;
                 if (audio_extn_hfp_is_active(adev))
                     platform_set_echo_reference(adev, true, out_device);
             }
