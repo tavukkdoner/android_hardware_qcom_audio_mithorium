@@ -2828,6 +2828,9 @@ int select_devices(struct audio_device *adev, audio_usecase_t uc_id)
                                                      AUDIO_DEVICE_IN_USB_HEADSET) &&
                                  is_single_device_type_equal(&vc_usecase->device_list,
                                                         AUDIO_DEVICE_OUT_USB_HEADSET))||
+                                (is_single_device_type_equal(&usecase->device_list,
+                                                     AUDIO_DEVICE_IN_USB_HEADSET) &&
+                                 is_codec_backend_out_device_type(&vc_usecase->device_list)) ||
                                  (is_single_device_type_equal(&usecase->device_list,
                                                      AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET) &&
                                  is_codec_backend_out_device_type(&vc_usecase->device_list)))) {
@@ -3235,8 +3238,14 @@ static int stop_input_stream(struct stream_in *in)
 
     if (priority_in == in) {
         priority_in = get_priority_input(adev);
-        if (priority_in)
-            select_devices(adev, priority_in->usecase);
+        if (priority_in) {
+            if (is_usb_in_device_type(&priority_in->device_list)) {
+                if (audio_extn_usb_connected(NULL))
+                    select_devices(adev, priority_in->usecase);
+            } else {
+                select_devices(adev, priority_in->usecase);
+            }
+        }
     }
 
     enable_gcov();
