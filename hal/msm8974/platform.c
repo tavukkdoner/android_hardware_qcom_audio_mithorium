@@ -9444,6 +9444,11 @@ int64_t platform_get_audio_source_delay(audio_source_t audio_source)
         return 0;
     }
 
+    if (audio_source == AUDIO_SOURCE_FM_TUNER) {
+	/* stop spamming invalid audio_source for FM */
+	return 0;
+    }
+
     if ((audio_source < AUDIO_SOURCE_DEFAULT) ||
             (audio_source > AUDIO_SOURCE_MAX)) {
         ALOGE("%s: Invalid audio_source = %d", __func__, audio_source);
