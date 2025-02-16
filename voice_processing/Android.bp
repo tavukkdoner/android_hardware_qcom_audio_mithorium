@@ -11,7 +11,6 @@ cc_library_shared {
     cflags: [
         "-fvisibility=hidden",
         "-Werror",
-        "-Wno-gnu-designator",
     ] + select(soong_config_variable("qtiaudio", "target_board_auto"), {
         "true": ["-D_FORTIFY_SOURCE=2", "-fstack-protector-strong"],
         default: [],
