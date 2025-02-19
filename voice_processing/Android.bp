@@ -30,7 +30,4 @@ cc_library_shared {
         "liblog",
     ],
 
-    sanitize: {
-        integer_overflow: true,
-    },
 }

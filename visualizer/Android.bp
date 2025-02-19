@@ -34,7 +34,4 @@ cc_library_shared {
         "libtinyalsa",
     ],
 
-    sanitize: {
-        integer_overflow: true,
-    },
 }
