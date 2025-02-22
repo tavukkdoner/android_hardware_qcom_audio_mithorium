@@ -1,0 +1,21 @@
+cc_binary {
+    name: "stt_meta_extract",
+    srcs: ["stt_meta_extract.c"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wno-sign-compare",
+    ],
+    shared_libs: [
+        "libtinyalsa",
+        "libcutils",
+        "liblog",
+    ],
+
+    include_dirs: ["external/tinyalsa/include"],
+
+    compile_multilib: "32",
+
+    vendor: true,
+
+}
