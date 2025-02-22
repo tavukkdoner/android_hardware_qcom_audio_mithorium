@@ -9,7 +9,7 @@ cc_library_shared {
     vendor: true,
 
     srcs: [
-        "offload_visualizer.c"
+        "offload_visualizer.c",
     ],
 
     cflags: [
